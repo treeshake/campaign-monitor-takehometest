@@ -1,6 +1,9 @@
 plugins {
     id("java")
+    id("org.springframework.boot") version "3.3.3"
 }
+
+apply(plugin = "io.spring.dependency-management")
 
 group = "au.com.treeshake"
 version = "1.0-SNAPSHOT"
@@ -10,10 +13,9 @@ repositories {
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-}
-
-tasks.test {
-    useJUnitPlatform()
+    implementation("org.yaml:snakeyaml:2.3")
+    implementation("org.springframework.boot:spring-boot:3.3.3")
+    implementation("org.springframework:spring-web:6.1.12")
+    implementation("org.springframework.boot:spring-boot-starter-logging:3.3.3")
+    implementation("org.jsoup:jsoup:1.18.1")
 }

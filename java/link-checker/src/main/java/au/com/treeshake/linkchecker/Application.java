@@ -16,6 +16,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Using Spring, since it gives some suitable defaults around async processing.
  * 
+ * Special note: Fetch request to amazon.com returns 503 as it has detected that this program
+ * is crawling their website.
  */
 @ComponentScan
 @Configuration
@@ -24,6 +26,7 @@ public class Application {
     public static void main(String[] args) throws IOException, InterruptedException {
         ConfigurableApplicationContext ctx = SpringApplication.run(Application.class, args);
         LinkCheckerService service = ctx.getBean(LinkCheckerService.class);
+
         File file = ResourceUtils.getFile("classpath:page.html");
         var links = service.extractLinks(file);
 
@@ -34,5 +37,5 @@ public class Application {
         }
         requests.stream().forEach(CompletableFuture::join);
     }
-    
+
 }

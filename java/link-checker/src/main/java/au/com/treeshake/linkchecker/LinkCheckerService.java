@@ -30,8 +30,10 @@ public class LinkCheckerService {
         LOG.info("Started task: {}", link);
         RestClient defaultClient = RestClient.create();
         var response = defaultClient.get().uri(url).retrieve()
-                // Handle any HTTP status code that is an error (4xx, 5xx)
-                .onStatus(HttpStatusCode::isError, (_, res) -> link.setStatus(res.getStatusCode()))
+                // Handle any HTTP status code that is an error (4xx, 5xx), otherwise without this line,
+                // exception is thrown by the http client as a default.
+                .onStatus(HttpStatusCode::isError, (req, res) -> link.setStatus(res.getStatusCode()))
+                // Discard the response body, only interested in the HTTP status.
                 .toBodilessEntity();
         link.setStatus(response.getStatusCode());
         LOG.info("Finished task: {}", link);

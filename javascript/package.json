@@ -1,0 +1,21 @@
+{
+  "name": "campaign-monitor-js",
+  "version": "1.0.0",
+  "description": "Campaign Monitor take home test",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rm -rf ./dist",
+    "build": "npm run clean && tsc",
+    "tests": "jest"
+  },
+  "author": "Danh Nguyen",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-typescript": "^7.26.0",
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.7.2"
+  }
+}

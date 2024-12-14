@@ -1,8 +1,12 @@
-package au.com.treeshake.linkchecker;
+package au.com.treeshake.linkchecker.domain;
 
 import org.springframework.http.HttpStatusCode;
 
-public class Link {
+import java.io.Serializable;
+
+public class Link implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     private final String url;
     private HttpStatusCode status;
 

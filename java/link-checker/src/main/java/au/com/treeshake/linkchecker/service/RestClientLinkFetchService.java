@@ -1,31 +1,22 @@
-package au.com.treeshake.linkchecker;
+package au.com.treeshake.linkchecker.service;
+
+import au.com.treeshake.linkchecker.domain.Link;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import org.springframework.http.HttpStatusCode;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 @Service
-public class LinkCheckerService {
+public class RestClientLinkFetchService implements AsyncLinkFetchService{
 
-    private static final Logger LOG = LoggerFactory.getLogger(LinkCheckerService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RestClientLinkFetchService.class);
     
-    Elements extractLinks(File file) throws IOException {
-        LOG.info("Extracting links from file: {}", file.getName());
-        Document doc = Jsoup.parse(file);
-        return doc.select("a[href]");
-    }
-
     @Async
-    CompletableFuture<Link> fetchUrlAsync(String url) throws InterruptedException {
+    public CompletableFuture<Link> fetchUrl(String url) {
         Link link = new Link(url);
         LOG.info("Started task: {}", link);
         RestClient defaultClient = RestClient.create();

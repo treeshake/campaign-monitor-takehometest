@@ -1,5 +1,8 @@
 package au.com.treeshake.linkchecker;
 
+import au.com.treeshake.linkchecker.domain.Link;
+import au.com.treeshake.linkchecker.service.JsoupLinkExtractionService;
+import au.com.treeshake.linkchecker.service.RestClientLinkFetchService;
 import org.jsoup.nodes.Element;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -8,11 +11,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.util.ResourceUtils;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
@@ -32,27 +33,32 @@ import java.util.concurrent.CompletableFuture;
 @EnableAsync
 public class Application implements ApplicationRunner {
 
-    private final LinkCheckerService service;
+    private final RestClientLinkFetchService service;
+    private final JsoupLinkExtractionService linkExtractionService;
+    private final ResourceLoader resourceLoader;
 
-    public Application(LinkCheckerService service) {
+    public Application(RestClientLinkFetchService service,
+                       JsoupLinkExtractionService linkExtractionService,
+                       ResourceLoader resourceLoader) {
         this.service = service;
+        this.linkExtractionService = linkExtractionService;
+        this.resourceLoader = resourceLoader;
     }
 
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext ctx = SpringApplication.run(Application.class, args);
-        Application app = ctx.getBean(Application.class);
+        var app = ctx.getBean(Application.class);
         app.run(new DefaultApplicationArguments(args));
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        File file = ResourceUtils.getFile("classpath:page.html");
-        var links = service.extractLinks(file);
-
+        var resource = resourceLoader.getResource("classpath:page.html");
+        var links = linkExtractionService.extractLinks(resource);
         var requests = new ArrayList<CompletableFuture<Link>>();
         for (Element link : links) {
             var url = link.attr("abs:href");
-            requests.add(service.fetchUrlAsync(url));
+            requests.add(service.fetchUrl(url));
         }
         requests.stream().forEach(CompletableFuture::join);
     }

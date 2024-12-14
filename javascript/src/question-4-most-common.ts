@@ -1,7 +1,27 @@
 /**
  * Question 4 - Most common
  */
-export function findMostCommon(numbers: number[]): number[] {
+export function findMostCommon(input: unknown): number[] {
+  // Validate inputs: Check if the input is an array, if it's empty, and if it contains only numbers.
+
+  if (!Array.isArray(input)) {
+    throw new InvalidInputException(input, "Expected an array");
+  }
+
+  if (input.length === 0) {
+    return [];
+  }
+
+  if (input.some(isNotANumber)) {
+    throw new InvalidInputException(
+      input,
+      "One or more values is not a number"
+    );
+  }
+
+  // Coerce the input to a number array since we've already validated the input.
+  const numbers = input as number[];
+
   // An inner function that accepts a "count" value and runs a filter on the input numbers array.
   const countOccurrences = (count: number) =>
     numbers.filter((number) => number === count).length;
@@ -19,4 +39,18 @@ export function findMostCommon(numbers: number[]): number[] {
   );
 
   return Array.from(uniqueResults);
+}
+
+function isNotANumber(value: unknown): value is number {
+  return typeof value !== "number" || isNaN(value);
+}
+
+class InvalidInputException extends Error {
+  constructor(input: unknown, message: string) {
+    super(message);
+    this.name = "InvalidInputException";
+    this.message = `Supplied input '${JSON.stringify(
+      input
+    )}' is invalid: ${message}`;
+  }
 }

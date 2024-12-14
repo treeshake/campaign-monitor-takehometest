@@ -7,5 +7,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @Configuration
 @EnableAsync
 @EnableAspectJAutoProxy
+//@EnableCaching
 public class AppConfiguration {
 }

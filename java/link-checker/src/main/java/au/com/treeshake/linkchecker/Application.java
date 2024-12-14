@@ -1,18 +1,15 @@
 package au.com.treeshake.linkchecker;
 
-import au.com.treeshake.linkchecker.domain.Link;
 import au.com.treeshake.linkchecker.service.AsyncFetchUrlService;
-import au.com.treeshake.linkchecker.service.LinkExtractionService;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import au.com.treeshake.linkchecker.service.UrlExtractionService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.ResourceLoader;
 
-import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * Using Spring, since it gives some suitable defaults around async processing,
@@ -39,26 +36,26 @@ public class Application implements ApplicationRunner {
     }
 
     private final AsyncFetchUrlService restClientService;
-    private final LinkExtractionService<Elements> linkExtractionService;
+    private final UrlExtractionService urlExtractionService;
     private final ResourceLoader resourceLoader;
 
     public Application(AsyncFetchUrlService restClientService,
-                       LinkExtractionService<Elements> linkExtractionService,
+                       UrlExtractionService urlExtractionService,
                        ResourceLoader resourceLoader) {
         this.restClientService = restClientService;
-        this.linkExtractionService = linkExtractionService;
+        this.urlExtractionService = urlExtractionService;
         this.resourceLoader = resourceLoader;
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         var resource = resourceLoader.getResource("classpath:page.html");
-        var links = linkExtractionService.extractLinks(resource);
-        var requests = new ArrayList<CompletableFuture<Link>>();
-        for (Element link : links) {
-            var url = link.attr("abs:href");
-            requests.add(restClientService.fetchUrl(url));
-        }
-        requests.stream().forEach(CompletableFuture::join);
+        var urls = urlExtractionService.extractLinks(resource);
+
+        var futures = urls.stream()
+                .map(restClientService::fetchUrl)
+                .collect(Collectors.toList());
+
+        futures.stream().map(CompletableFuture::join);
     }
 }

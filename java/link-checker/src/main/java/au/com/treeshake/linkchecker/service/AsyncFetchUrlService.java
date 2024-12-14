@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Interface for fetching links asynchronously.
  */
-public interface AsyncLinkFetchService {
+public interface AsyncFetchUrlService {
 
     /**
      * Fetches the URL asynchronously.

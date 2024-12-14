@@ -6,12 +6,14 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-public class JsoupLinkExtractionService implements LinkExtractionService<Elements> {
+@Service
+public class LinkExtractionJsoupService implements LinkExtractionService<Elements> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JsoupLinkExtractionService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LinkExtractionJsoupService.class);
 
     @Override
     public Elements extractLinks(Resource resource) throws IOException {

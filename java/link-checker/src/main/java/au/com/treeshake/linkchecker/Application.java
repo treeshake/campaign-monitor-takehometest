@@ -1,18 +1,15 @@
 package au.com.treeshake.linkchecker;
 
 import au.com.treeshake.linkchecker.domain.Link;
-import au.com.treeshake.linkchecker.service.JsoupLinkExtractionService;
-import au.com.treeshake.linkchecker.service.RestClientLinkFetchService;
+import au.com.treeshake.linkchecker.service.AsyncFetchUrlService;
+import au.com.treeshake.linkchecker.service.LinkExtractionService;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
@@ -29,26 +26,28 @@ import java.util.concurrent.CompletableFuture;
  * is crawling their website.
  */
 @ComponentScan
-@Configuration
-@EnableAsync
 public class Application implements ApplicationRunner {
 
-    private final RestClientLinkFetchService service;
-    private final JsoupLinkExtractionService linkExtractionService;
-    private final ResourceLoader resourceLoader;
-
-    public Application(RestClientLinkFetchService service,
-                       JsoupLinkExtractionService linkExtractionService,
-                       ResourceLoader resourceLoader) {
-        this.service = service;
-        this.linkExtractionService = linkExtractionService;
-        this.resourceLoader = resourceLoader;
+    /**
+     * Main entry point for the application.
+     *
+     * @param args No args required.
+     * @throws Exception - Propagate any exceptions out of the application.
+     */
+    public static void main(String[] args) throws Exception {
+        SpringApplication.run(Application.class, args);
     }
 
-    public static void main(String[] args) throws Exception {
-        ConfigurableApplicationContext ctx = SpringApplication.run(Application.class, args);
-        var app = ctx.getBean(Application.class);
-        app.run(new DefaultApplicationArguments(args));
+    private final AsyncFetchUrlService restClientService;
+    private final LinkExtractionService<Elements> linkExtractionService;
+    private final ResourceLoader resourceLoader;
+
+    public Application(AsyncFetchUrlService restClientService,
+                       LinkExtractionService<Elements> linkExtractionService,
+                       ResourceLoader resourceLoader) {
+        this.restClientService = restClientService;
+        this.linkExtractionService = linkExtractionService;
+        this.resourceLoader = resourceLoader;
     }
 
     @Override
@@ -58,7 +57,7 @@ public class Application implements ApplicationRunner {
         var requests = new ArrayList<CompletableFuture<Link>>();
         for (Element link : links) {
             var url = link.attr("abs:href");
-            requests.add(service.fetchUrl(url));
+            requests.add(restClientService.fetchUrl(url));
         }
         requests.stream().forEach(CompletableFuture::join);
     }

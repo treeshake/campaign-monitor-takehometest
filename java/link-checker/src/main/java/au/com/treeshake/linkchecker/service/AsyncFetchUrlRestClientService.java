@@ -11,23 +11,28 @@ import org.springframework.web.client.RestClient;
 import java.util.concurrent.CompletableFuture;
 
 @Service
-public class RestClientLinkFetchService implements AsyncLinkFetchService{
+public class AsyncFetchUrlRestClientService implements AsyncFetchUrlService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RestClientLinkFetchService.class);
-    
+    private static final Logger LOG = LoggerFactory.getLogger(AsyncFetchUrlRestClientService.class);
+
     @Async
     public CompletableFuture<Link> fetchUrl(String url) {
-        Link link = new Link(url);
-        LOG.info("Started task: {}", link);
-        RestClient defaultClient = RestClient.create();
-        var response = defaultClient.get().uri(url).retrieve()
+        LOG.info("Started task: {}", url);
+        var defaultClient = RestClient.create();
+        var link = performHttpRequest(defaultClient, url);
+        LOG.info("Finished task: {}", link);
+        return CompletableFuture.completedFuture(link);
+    }
+
+    private Link performHttpRequest(RestClient restClient, String url) {
+        var link = new Link(url);
+        var response = restClient.get().uri(url).retrieve()
                 // Handle any HTTP status code that is an error (4xx, 5xx), otherwise without this line,
                 // exception is thrown by the http client as a default.
                 .onStatus(HttpStatusCode::isError, (req, res) -> link.setStatus(res.getStatusCode()))
                 // Discard the response body, only interested in the HTTP status.
                 .toBodilessEntity();
         link.setStatus(response.getStatusCode());
-        LOG.info("Finished task: {}", link);
-        return CompletableFuture.completedFuture(link);
+        return link;
     }
 }

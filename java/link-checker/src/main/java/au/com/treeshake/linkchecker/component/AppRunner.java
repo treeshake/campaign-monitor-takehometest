@@ -10,6 +10,11 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
+import java.net.URL;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Component
 public class AppRunner implements ApplicationRunner {
@@ -39,15 +44,13 @@ public class AppRunner implements ApplicationRunner {
             return;
         }
 
-        Link link = linkService.performGetRequest("https://www.google.com");
-        log.info("Link: {}. Duration: {}ms", link, link.getTimer().getDurationInMillis());
-        Link link2 = linkService.performGetRequest("https://www.google.com");
-        log.info("Link: {}. Duration: {}ms", link2, link2.getTimer().getDurationInMillis());
-//        var futures = urls.stream()
-//                .map(URL::toString)
-//                .map(asyncService::performGetRequest)
-//                .collect(Collectors.toList());
-//
-//        futures.stream().map(CompletableFuture::join);
+        var url1 = new URL("https://www.google.com");
+        var url2 = new URL("https://www.google.com");        
+        var futures = List.of(url1, url2).stream()
+                .map(URL::toString)
+                .map(asyncService::performGetRequest)
+                .collect(Collectors.toList());
+
+        futures.stream().map(CompletableFuture::join);
     }
 }

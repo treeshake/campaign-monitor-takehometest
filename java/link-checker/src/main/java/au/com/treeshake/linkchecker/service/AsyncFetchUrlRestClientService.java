@@ -16,18 +16,22 @@ import java.util.concurrent.CompletableFuture;
 public class AsyncFetchUrlRestClientService implements AsyncFetchUrlService {
 
     private static final Logger LOG = LoggerFactory.getLogger(AsyncFetchUrlRestClientService.class);
+    private RestClient restClient;
+
+    public AsyncFetchUrlRestClientService(RestClient restClient) {
+        this.restClient = restClient;
+    }
 
     @Async
     public CompletableFuture<Link> fetchUrl(URL url) {
         LOG.info("Started task: {}", url.toString());
-        var defaultClient = RestClient.create();
-        var link = performHttpRequest(defaultClient, url.toString());
+        var link = performHttpRequest(url.toString());
         LOG.info("Finished task: {}", link);
         return CompletableFuture.completedFuture(link);
     }
 
     @Cacheable("links")
-    private Link performHttpRequest(RestClient restClient, String url) {
+    public Link performHttpRequest(String url) {
         var link = new Link(url);
         var response = restClient.get().uri(url).retrieve()
                 // Handle any HTTP status code that is an error (4xx, 5xx), otherwise without this line,

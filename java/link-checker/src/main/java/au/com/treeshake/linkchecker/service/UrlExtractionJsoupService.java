@@ -1,5 +1,6 @@
 package au.com.treeshake.linkchecker.service;
 
+import lombok.SneakyThrows;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,13 +32,8 @@ public class UrlExtractionJsoupService implements UrlExtractionService {
                 .toList();
     }
 
+    @SneakyThrows(MalformedURLException.class)
     private URL mapToUrl(String element) {
-        try {
-            return new URL(element);
-        } catch (MalformedURLException e) {
-            // Convert the checked exception to an unchecked exception. Could possibly handle errors better here.
-            // But only considering the positive cases for the purposes of this test.
-            throw new RuntimeException(e);
-        }
+        return new URL(element);
     }
 }

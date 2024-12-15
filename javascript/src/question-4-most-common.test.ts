@@ -32,7 +32,7 @@ describe("findMostCommon", () => {
 
   test("should throw InvalidInputException for array with non-number elements", () => {
     expect(() => findMostCommon([1, "a", 3])).toThrow(
-      "Supplied input '[1,\"a\",3]' is invalid: One or more values supplied is not a number"
+      "Supplied input '[1,\"a\",3]' is invalid: One or more values is not a number"
     );
   });
 });

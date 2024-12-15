@@ -6,7 +6,7 @@
 
 -- A. Return the names of all salespeople that have an order with George
 SELECT
-  sp."Name"
+  distinct sp."Name"
 FROM
   "Salesperson" sp
   JOIN "Orders" o ON sp."SalespersonID" = o."SalespersonID"
@@ -17,7 +17,7 @@ WHERE
 
 -- B. Return the names of all salespeople that do not have any order with George
 SELECT
-  sp."Name"
+  distinct sp."Name"
 FROM
   "Salesperson" sp
   JOIN "Orders" o ON sp."SalespersonID" = o."SalespersonID"
@@ -50,7 +50,7 @@ FROM
 ORDER BY
   "Salary" DESC
 LIMIT
-  3 OFFSET 2;
+  1 OFFSET 2;
 
 -- B. Create a new roll-up table BigOrders(where columns are CustomerID,
 -- TotalOrderValue), and insert into that table customers whose total Amount across all
@@ -64,5 +64,15 @@ FROM
 GROUP BY
   ROLLUP ("CustomerID")
 HAVING
-  "TotalOrderValue" > 1000;
+  sum("NumberOfUnits" * "CostOfUnit") > 1000 and "CustomerID" is not NULL
+
+
+-- C Return the total Amount of orders for each month, ordered by year, then month (both in
+-- descending order)
+SELECT 
+    DATE_TRUNC('month', "OrderDate") AS "Month",
+    SUM("NumberOfUnits" * "CostOfUnit") AS "TotalAmount"
+FROM "Orders"
+GROUP BY DATE_TRUNC('month', "OrderDate")
+ORDER BY DATE_TRUNC('month', "OrderDate") DESC;
 

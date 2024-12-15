@@ -1,6 +1,7 @@
 package au.com.treeshake.linkchecker;
 
-import au.com.treeshake.linkchecker.service.AsyncFetchUrlService;
+import au.com.treeshake.linkchecker.domain.Link;
+import au.com.treeshake.linkchecker.service.HttpRequestAsyncService;
 import au.com.treeshake.linkchecker.service.UrlExtractionService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -35,14 +36,14 @@ public class Application implements ApplicationRunner {
         SpringApplication.run(Application.class, args);
     }
 
-    private final AsyncFetchUrlService restClientService;
+    private final HttpRequestAsyncService<Link> asyncService;
     private final UrlExtractionService urlExtractionService;
     private final ResourceLoader resourceLoader;
 
-    public Application(AsyncFetchUrlService restClientService,
+    public Application(HttpRequestAsyncService<Link> asyncService,
                        UrlExtractionService urlExtractionService,
                        ResourceLoader resourceLoader) {
-        this.restClientService = restClientService;
+        this.asyncService = asyncService;
         this.urlExtractionService = urlExtractionService;
         this.resourceLoader = resourceLoader;
     }
@@ -53,7 +54,7 @@ public class Application implements ApplicationRunner {
         var urls = urlExtractionService.extractLinks(resource);
 
         var futures = urls.stream()
-                .map(restClientService::fetchUrl)
+                .map(asyncService::performGetRequest)
                 .collect(Collectors.toList());
 
         futures.stream().map(CompletableFuture::join);

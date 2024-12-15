@@ -13,10 +13,11 @@ repositories {
 }
 
 dependencies {
-    implementation("org.yaml:snakeyaml:2.3")
     implementation("org.springframework.boot:spring-boot:3.3.3")
     implementation("org.springframework:spring-web:6.1.12")
     implementation("org.springframework.boot:spring-boot-starter-logging:3.3.3")
+    implementation("org.springframework.boot:spring-boot-starter-cache:3.4.0")
+    implementation("org.yaml:snakeyaml:2.3")
     implementation("org.jsoup:jsoup:1.18.1")
     compileOnly("org.projectlombok:lombok:1.18.36")
     annotationProcessor("org.projectlombok:lombok:1.18.36")

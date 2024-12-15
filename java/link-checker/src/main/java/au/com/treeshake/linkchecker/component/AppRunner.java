@@ -10,10 +10,9 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
-import java.net.URL;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.net.URL;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Component
@@ -43,10 +42,8 @@ public class AppRunner implements ApplicationRunner {
             log.info("No URLs found in the page. Finishing...");
             return;
         }
-
-        var url1 = new URL("https://www.google.com");
-        var url2 = new URL("https://www.google.com");        
-        var futures = List.of(url1, url2).stream()
+        
+        var futures = urls.stream()
                 .map(URL::toString)
                 .map(asyncService::performGetRequest)
                 .collect(Collectors.toList());

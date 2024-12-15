@@ -11,7 +11,7 @@ import org.springframework.web.client.RestClient;
 @Service
 public class HttpRequestCacheableLinkService implements HttpRequestService<Link> {
 
-    private RestClient restClient;
+    private final RestClient restClient;
 
     public HttpRequestCacheableLinkService(RestClient restClient) {
         this.restClient = restClient;

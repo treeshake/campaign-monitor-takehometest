@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 public class HttpRequestAsyncLinkService implements HttpRequestAsyncService<Link> {
 
     private HttpRequestService<Link> httpRequestService;
-    
+
     public HttpRequestAsyncLinkService(HttpRequestService<Link> httpRequestService) {
         this.httpRequestService = httpRequestService;
     }
@@ -29,7 +29,7 @@ public class HttpRequestAsyncLinkService implements HttpRequestAsyncService<Link
         timer.start();
         var link = httpRequestService.performGetRequest(url);
         timer.stop();
-        log.info("Finished task: {}. Took: {}ms", link, timer.getDurationInMillis());
+        log.info("Finished task: {}. Took {}ms.", url, timer.getDurationInMillis());
         return CompletableFuture.completedFuture(link);
     }
 }

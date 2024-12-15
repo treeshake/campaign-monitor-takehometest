@@ -9,14 +9,15 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class UrlExtractionJsoupService implements UrlExtractionService {
 
     @Override
-    public List<URL> extractLinks(Resource resource) throws IOException {
+    public HashSet<URL> extractLinks(Resource resource) throws IOException {
         if (resource == null) {
             throw new IllegalArgumentException("Resource cannot be null");
         }
@@ -27,7 +28,7 @@ public class UrlExtractionJsoupService implements UrlExtractionService {
         return hrefElements.stream()
                 .map(element -> element.attr("abs:href"))
                 .map(this::mapToUrl)
-                .toList();
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @SneakyThrows(MalformedURLException.class)

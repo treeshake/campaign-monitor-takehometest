@@ -2,7 +2,6 @@ package au.com.treeshake.linkchecker.service;
 
 import au.com.treeshake.linkchecker.domain.CacheStatus;
 import au.com.treeshake.linkchecker.domain.CacheableLink;
-import au.com.treeshake.linkchecker.domain.DurationTimer;
 import au.com.treeshake.linkchecker.domain.Link;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachePut;
@@ -24,7 +23,7 @@ public class HttpRequestCacheableLinkService implements HttpRequestService<Link>
     @Cacheable
     @Override
     public Link performGetRequest(String url) {
-        var link = new CacheableLink(url, new DurationTimer());
+        var link = new CacheableLink(url);
         link.getTimer().start();
         var response = restClient.get().uri(url).retrieve()
                 // Handle any HTTP status code that is an error (4xx, 5xx), otherwise without this line,
@@ -34,12 +33,13 @@ public class HttpRequestCacheableLinkService implements HttpRequestService<Link>
                 .toBodilessEntity();
         link.getTimer().stop();
         link.setStatus(response.getStatusCode());
+        link.setCacheStatus(CacheStatus.HIT);
         return link;
     }
 
     @CachePut
     public Link updateCacheStatus(String url) {
-        var link = new CacheableLink(url, new DurationTimer());
+        var link = new CacheableLink(url);
         link.getTimer().start();
         link.setCacheStatus(CacheStatus.HIT);
         link.getTimer().stop();

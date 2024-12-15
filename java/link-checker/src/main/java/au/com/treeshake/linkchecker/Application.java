@@ -1,16 +1,7 @@
 package au.com.treeshake.linkchecker;
 
-import au.com.treeshake.linkchecker.domain.Link;
-import au.com.treeshake.linkchecker.service.HttpRequestAsyncService;
-import au.com.treeshake.linkchecker.service.UrlExtractionService;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.core.io.ResourceLoader;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 /**
  * Using Spring, since it gives some suitable defaults around async processing,
@@ -24,39 +15,9 @@ import java.util.stream.Collectors;
  * is crawling their website.
  */
 @ComponentScan
-public class Application implements ApplicationRunner {
+public class Application {
 
-    /**
-     * Main entry point for the application.
-     *
-     * @param args No args required.
-     * @throws Exception - Propagate any exceptions out of the application.
-     */
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Application.class, args);
-    }
-
-    private final HttpRequestAsyncService<Link> asyncService;
-    private final UrlExtractionService urlExtractionService;
-    private final ResourceLoader resourceLoader;
-
-    public Application(HttpRequestAsyncService<Link> asyncService,
-                       UrlExtractionService urlExtractionService,
-                       ResourceLoader resourceLoader) {
-        this.asyncService = asyncService;
-        this.urlExtractionService = urlExtractionService;
-        this.resourceLoader = resourceLoader;
-    }
-
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        var resource = resourceLoader.getResource("classpath:page.html");
-        var urls = urlExtractionService.extractLinks(resource);
-
-        var futures = urls.stream()
-                .map(asyncService::performGetRequest)
-                .collect(Collectors.toList());
-
-        futures.stream().map(CompletableFuture::join);
     }
 }
